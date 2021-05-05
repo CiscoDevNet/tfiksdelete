@@ -8,6 +8,10 @@ terraform {
   }
 }
 
+variable "name" {
+  default = "https://www.intersight.com"
+}
+
 variable "api_key" {
   type = string
 }
