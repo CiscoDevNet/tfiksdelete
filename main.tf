@@ -1,3 +1,15 @@
+#get the data fro the global vars WS
+data "terraform_remote_state" "global" {
+  backend = "remote"
+  config = {
+    organization = "CiscoDevNet"
+    workspaces = {
+      name = var.globalwsname
+    }
+  }
+}
+
+
 # Intersight Provider Information 
 terraform {
   required_providers {
@@ -10,6 +22,10 @@ terraform {
 
 variable "name" {
   default = "https://www.intersight.com"
+}
+
+variable "globalwsname" {
+  type = string
 }
 
 variable "api_key" {
@@ -40,10 +56,13 @@ data "intersight_organization_organization" "organization_moid" {
 
 resource "intersight_kubernetes_cluster_profile" "kubeprofaction" {
   action = "Delete"
-  name = var.name
+  name = local.clustername 
   organization {
     object_type = "organization.Organization"
     moid        = data.intersight_organization_organization.organization_moid.results.0.moid 
   }
 }
 
+locals {
+  clustername = yamldecode(data.terraform_remote_state.global.outputs.clustername)
+}
